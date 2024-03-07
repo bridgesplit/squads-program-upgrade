@@ -87,10 +87,28 @@ export const createProgramUpgrade = async ({
     })
     .preInstructions([
       ComputeBudgetProgram.setComputeUnitPrice({
-        microLamports: new BN(1000)
+        microLamports: new BN(100000)
       })
     ])
-  const txid = await methods.rpc()
+    const maxRetries = 5;
+    let attempt = 0;
+    let txid;
+
+  while (attempt < maxRetries) {
+    try {
+      txid = await methods.rpc();
+      // If the call succeeds, break out of the loop
+      break;
+    } catch (error) {
+      console.error(`Attempt ${attempt + 1} failed:`, error);
+      attempt++;
+      // No delay because .rpc() waits for 30s
+    }
+  }
+
+  if (attempt === maxRetries) {
+    throw Error('All attempts to call methods.rpc() have failed.');
+  }
   console.log(
     `Successfully created program upgrade for MS_PDA ${multisig.toString()} https://explorer.solana.com/tx/${txid}`
   )

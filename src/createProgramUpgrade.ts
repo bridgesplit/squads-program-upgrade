@@ -102,7 +102,7 @@ export const createProgramUpgrade = async ({
     } catch (error) {
       console.error(`Attempt ${attempt + 1} failed:`, error);
       attempt++;
-      // Optionally, add a delay here if needed
+      // No delay because .rpc() waits for 30s
     }
   }
 
